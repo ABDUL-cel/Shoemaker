@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us | Samadii4KT Luxe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black: #0a0908;
+    --black-2: #131110;
+    --panel: #17140f;
+    --gold: #D4AF37;
+    --gold-light: #F1DA9B;
+    --gold-deep: #9C7A26;
+    --cream: #F3EDDD;
+    --cream-dim: #C9BFA6;
+    --hairline: rgba(212,175,55,0.25);
+  }
+
+  body.light-mode{
+    --black: #E9E7E1;
+    --black-2: #DEDBD2;
+    --panel: #FFFFFF;
+    --cream: #211D14;
+    --cream-dim: #5B5442;
+    --hairline: rgba(156,122,38,0.3);
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--black);
+    color:var(--cream);
+    font-family:'Jost', sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+    transition:background 0.5s ease, color 0.5s ease;
+  }
+
+  body.light-mode header{
+    background:linear-gradient(to bottom, rgba(233,231,225,0.94), rgba(233,231,225,0));
+  }
+  body.light-mode header.scrolled{
+    background:rgba(233,231,225,0.94);
+    border-bottom:1px solid var(--hairline);
+  }
+  body.light-mode .hero{
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.12), transparent 60%),
+      linear-gradient(180deg, #F1EFE9 0%, #E9E7E1 60%, #DEDBD2 100%);
+  }
+  body.light-mode .btn-gold{ color:#FAF7F0; }
+
+  /* cards become clean white "cards" with soft shadow in light mode */
+  body.light-mode .cat-card,
+  body.light-mode .product-card,
+  body.light-mode .test-card{
+    background:var(--panel);
+    box-shadow:0 8px 28px -12px rgba(80,64,20,0.18);
+    border-color:var(--hairline);
+  }
+  body.light-mode .cat-card::before{
+    background:radial-gradient(circle at 30% 20%, rgba(212,175,55,0.10), transparent 55%);
+  }
+  body.light-mode .product-img{
+    background:
+      radial-gradient(circle at 50% 40%, rgba(212,175,55,0.14), transparent 60%),
+      linear-gradient(160deg, #F3F1EB, #E7E4DC);
+    border-bottom:1px solid var(--hairline);
+  }
+  body.light-mode .design-banner{
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.16), transparent 65%),
+      linear-gradient(180deg, #F1EFE9, #E9E7E1);
+    border-color:var(--hairline);
+  }
+  body.light-mode footer{
+    background:#F1EFE9;
+    border-color:var(--hairline);
+  }
+  body.light-mode .why-icon{ border-color:var(--gold-deep); }
+  body.light-mode .social-icon{ color:var(--gold-deep); }
+  body.light-mode .wa-float svg{ fill:#FAF7F0; }
+
+  /* ---------- theme toggle switch ---------- */
+  .theme-toggle{
+    position:relative;
+    width:58px;
+    height:30px;
+    border-radius:999px;
+    border:1.5px solid #4ADE80;
+    background:linear-gradient(90deg, #0a0908 0%, #0a0908 50%, #F3EDDD 50%, #F3EDDD 100%);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    padding:3px;
+    box-shadow:0 0 10px rgba(74,222,128,0.35), inset 0 0 6px rgba(0,0,0,0.4);
+    transition:box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
+    flex-shrink:0;
+  }
+  .theme-toggle:hover{
+    border-color:#7CF5A8;
+    box-shadow:0 0 0 5px rgba(74,222,128,0.16), 0 0 26px rgba(74,222,128,0.65), inset 0 0 6px rgba(0,0,0,0.4);
+    transform:translateY(-1px) scale(1.04);
+  }
+  .theme-toggle:active{ transform:translateY(0) scale(0.98); }
+  .theme-toggle .knob{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:linear-gradient(140deg, var(--gold-light), var(--gold) 60%, var(--gold-deep));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transform:translateX(0);
+    box-shadow:0 2px 6px rgba(0,0,0,0.5);
+    transition:transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  body.light-mode .theme-toggle .knob{ transform:translateX(26px); }
+  .theme-toggle .knob svg{ width:13px; height:13px; }
+
+  h1,h2,h3,.display{
+    font-family:'Playfair Display', serif;
+    font-weight:600;
+    letter-spacing:0.01em;
+  }
+
+  .eyebrow{
+    font-family:'Jost', sans-serif;
+    font-size:0.72rem;
+    letter-spacing:0.32em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+
+  a{ color:inherit; text-decoration:none; }
+
+  img{ max-width:100%; display:block; }
+
+  .container{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 6vw;
+  }
+
+  /* ---------- crown divider signature ---------- */
+  .crown-divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    margin:0 auto 28px;
+  }
+  .crown-divider .line{
+    height:1px;
+    width:64px;
+    background:linear-gradient(90deg, transparent, var(--hairline));
+  }
+  .crown-divider .line.right{
+    background:linear-gradient(270deg, transparent, var(--hairline));
+  }
+  .crown-divider svg{ width:22px; height:22px; }
+
+  /* ---------- header ---------- */
+  header{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:22px 6vw;
+    background:linear-gradient(to bottom, rgba(10,9,8,0.92), rgba(10,9,8,0));
+    transition:background 0.4s ease, padding 0.4s ease;
+  }
+  header.scrolled{
+    background:rgba(10,9,8,0.92);
+    backdrop-filter:blur(10px);
+    padding:14px 6vw;
+    border-bottom:1px solid var(--hairline);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Playfair Display', serif;
+    font-size:1.15rem;
+    letter-spacing:0.08em;
+  }
+  .brand svg{ width:26px; height:26px; }
+  .brand .luxe{ color:var(--gold); font-style:italic; font-weight:600; }
+
+  .header-right{
+    display:flex;
+    align-items:center;
+    gap:34px;
+  }
+
+  nav{ display:flex; gap:38px; }  nav a{
+    font-size:0.78rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--cream-dim);
+    position:relative;
+    padding-bottom:4px;
+  }
+  nav a::after{
+    content:"";
+    position:absolute; left:0; bottom:0;
+    width:0; height:1px;
+    background:var(--gold);
+    transition:width 0.3s ease;
+  }
+  nav a:hover{ color:var(--gold-light); }
+  nav a:hover::after{ width:100%; }
+
+  .nav-toggle{ display:none; }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:120px 6vw 80px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.10), transparent 60%),
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px),
+      linear-gradient(180deg, #0d0c0a 0%, #0a0908 60%, #060505 100%);
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(212,175,55,0.05), transparent 35%),
+      radial-gradient(circle at 85% 75%, rgba(212,175,55,0.05), transparent 35%);
+    pointer-events:none;
+  }
+  .hero-content{ position:relative; z-index:2; max-width:760px; }
+  .hero .eyebrow{ opacity:0; animation:riseIn 0.9s 0.2s ease forwards; }
+  .hero h1{
+    font-size:clamp(2.6rem, 6vw, 4.6rem);
+    line-height:1.08;
+    margin:22px 0 20px;
+    opacity:0;
+    animation:riseIn 1s 0.4s ease forwards;
+  }
+  .hero h1 em{
+    font-style:italic;
+    background:linear-gradient(120deg, var(--gold-light), var(--gold) 45%, var(--gold-deep));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .hero p{
+    font-size:1.02rem;
+    color:var(--cream-dim);
+    max-width:480px;
+    margin:0 auto 40px;
+    line-height:1.7;
+    opacity:0;
+    animation:riseIn 1s 0.6s ease forwards;
+  }
+  .hero-ctas{
+    display:flex;
+    gap:18px;
+    justify-content:center;
+    flex-wrap:wrap;
+    opacity:0;
+    animation:riseIn 1s 0.8s ease forwards;
+  }
+
+  @keyframes riseIn{
+    from{ opacity:0; transform:translateY(18px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:15px 34px;
+    font-size:0.78rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    border-radius:2px;
+    cursor:pointer;
+    transition:transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+  }
+  .btn-gold{
+    background:linear-gradient(120deg, var(--gold-light), var(--gold) 60%, var(--gold-deep));
+    color:#0a0908;
+    font-weight:500;
+    border:1px solid transparent;
+  }
+  .btn-gold:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 30px -8px rgba(212,175,55,0.55);
+  }
+  .btn-outline{
+    border:1px solid var(--hairline);
+    color:var(--cream);
+  }
+  .btn-outline:hover{
+    border-color:var(--gold);
+    color:var(--gold-light);
+  }
+
+  .hero-shoe{
+    margin-top:56px;
+    opacity:0;
+    animation:riseIn 1.2s 1s ease forwards;
+  }
+
+  /* ---------- section shared ---------- */
+  section{ padding:120px 6vw; position:relative; }
+  .section-head{ text-align:center; max-width:600px; margin:0 auto 64px; }
+  .section-head h2{ font-size:clamp(1.9rem, 3.4vw, 2.6rem); }
+  .section-head p{ color:var(--cream-dim); margin-top:14px; font-size:0.98rem; line-height:1.7; }
+
+  /* ---------- categories ---------- */
+  .categories{ background:var(--black-2); }
+  .cat-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:26px;
+  }
+  .cat-card{
+    position:relative;
+    aspect-ratio:3/4;
+    border:1px solid var(--hairline);
+    padding:32px 26px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    overflow:hidden;
+    background:linear-gradient(160deg, #1c180f, #0d0c0a);
+    transition:border-color 0.4s ease;
+  }
+  .cat-card:hover{ border-color:var(--gold); }
+  .cat-card::before{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(circle at 30% 20%, rgba(212,175,55,0.14), transparent 55%);
+    opacity:0;
+    transition:opacity 0.5s ease;
+  }
+  .cat-card:hover::before{ opacity:1; }
+  .cat-num{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:0.85rem;
+    color:var(--gold-deep);
+    margin-bottom:auto;
+  }
+  .cat-card h3{ font-size:1.4rem; margin-bottom:8px; }
+  .cat-card span{ font-size:0.78rem; color:var(--cream-dim); letter-spacing:0.06em; }
+
+  /* ---------- best sellers ---------- */
+  .products-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:32px;
+  }
+  .product-card{
+    border:1px solid var(--hairline);
+    background:var(--panel);
+    transition:transform 0.4s ease, border-color 0.4s ease;
+  }
+  .product-card:hover{
+    transform:translateY(-6px);
+    border-color:var(--gold);
+  }
+  .product-img{
+    aspect-ratio:1/1;
+    background:
+      radial-gradient(circle at 50% 40%, rgba(212,175,55,0.16), transparent 60%),
+      linear-gradient(160deg, #1a1712, #0c0b09);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-bottom:1px solid var(--hairline);
+  }
+  .product-img svg{ width:58%; opacity:0.9; }
+  .product-info{ padding:22px 24px 26px; }
+  .product-info .tag{ font-size:0.68rem; letter-spacing:0.16em; color:var(--gold-deep); text-transform:uppercase; }
+  .product-info h3{ font-size:1.15rem; margin:8px 0 6px; }
+  .product-info .price{ color:var(--gold); font-family:'Cormorant Garamond', serif; font-size:1.3rem; font-weight:600; }
+
+  /* ---------- custom design CTA banner ---------- */
+  .design-banner{
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.14), transparent 65%),
+      linear-gradient(180deg, #100e0a, #0a0908);
+    text-align:center;
+    border-top:1px solid var(--hairline);
+    border-bottom:1px solid var(--hairline);
+  }
+  .design-banner .eyebrow{ display:block; margin-bottom:18px; }
+  .design-banner h2{ font-size:clamp(2rem, 4vw, 3rem); max-width:680px; margin:0 auto 20px; line-height:1.2; }
+  .design-banner p{ color:var(--cream-dim); max-width:500px; margin:0 auto 38px; line-height:1.7; }
+
+  /* ---------- why choose us ---------- */
+  .why-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:44px;
+  }
+  .why-item{ text-align:center; }
+  .why-icon{
+    width:54px; height:54px;
+    margin:0 auto 22px;
+    border:1px solid var(--gold-deep);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .why-icon svg{ width:24px; height:24px; }
+  .why-item h3{ font-size:1.1rem; margin-bottom:10px; }
+  .why-item p{ font-size:0.9rem; color:var(--cream-dim); line-height:1.7; }
+
+  /* ---------- testimonials ---------- */
+  .testimonials{ background:var(--black-2); }
+  .test-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:28px;
+  }
+  .test-card{
+    padding:34px 30px;
+    border:1px solid var(--hairline);
+    background:var(--panel);
+  }
+  .test-card .stars{ color:var(--gold); font-size:0.9rem; letter-spacing:2px; margin-bottom:18px; }
+  .test-card p{ font-size:0.95rem; line-height:1.75; color:var(--cream-dim); font-style:italic; margin-bottom:22px; }
+  .test-card .who{ font-size:0.78rem; letter-spacing:0.08em; color:var(--gold-light); text-transform:uppercase; }
+
+  /* ---------- footer ---------- */
+  footer{
+    padding:80px 6vw 40px;
+    background:#060504;
+    border-top:1px solid var(--hairline);
+  }
+  .footer-grid{
+    display:grid;
+    grid-template-columns:1.4fr 1fr 1fr;
+    gap:50px;
+    margin-bottom:60px;
+  }
+  .footer-brand .brand{ margin-bottom:18px; }
+  .footer-brand p{ color:var(--cream-dim); font-size:0.9rem; line-height:1.7; max-width:320px; }
+  .footer-col h4{
+    font-family:'Jost', sans-serif; font-weight:500;
+    font-size:0.78rem; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:20px;
+  }
+  .footer-col a, .footer-col p{
+    display:block;
+    font-size:0.9rem;
+    color:var(--cream-dim);
+    margin-bottom:12px;
+    transition:color 0.3s ease;
+  }
+  .footer-col a:hover{ color:var(--gold-light); }
+  .footer-bottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:14px;
+    padding-top:30px;
+    border-top:1px solid var(--hairline);
+    font-size:0.78rem;
+    color:var(--cream-dim);
+    letter-spacing:0.04em;
+  }
+
+  .social-row{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    padding-bottom:44px;
+  }
+  .social-icon{
+    width:44px; height:44px;
+    border-radius:50%;
+    border:1px solid var(--hairline);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--gold);
+    transition:transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+  }
+  .social-icon svg{ width:19px; height:19px; }
+  .social-icon:hover{
+    color:#0a0908;
+    background:linear-gradient(140deg, var(--gold-light), var(--gold) 60%, var(--gold-deep));
+    border-color:var(--gold);
+    transform:translateY(-3px);
+    box-shadow:0 10px 24px -8px rgba(212,175,55,0.6);
+  }
+
+  /* ---------- floating whatsapp ---------- */
+  .wa-float{
+    position:fixed;
+    bottom:26px; right:26px;
+    width:58px; height:58px;
+    border-radius:50%;
+    background:linear-gradient(140deg, var(--gold-light), var(--gold) 60%, var(--gold-deep));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 30px -6px rgba(212,175,55,0.6);
+    z-index:200;
+    transition:transform 0.3s ease;
+  }
+  .wa-float:hover{ transform:scale(1.08); }
+  .wa-float svg{ width:28px; height:28px; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:900px){
+    nav{
+      position:fixed; top:0; right:0; bottom:0;
+      width:min(78vw, 320px);
+      background:var(--black-2);
+      border-left:1px solid var(--hairline);
+      flex-direction:column;
+      padding:100px 34px;
+      gap:30px;
+      transform:translateX(100%);
+      transition:transform 0.4s ease, background 0.5s ease;
+    }
+    nav.open{ transform:translateX(0); box-shadow:-12px 0 40px -10px rgba(0,0,0,0.35); }
+    .nav-toggle{
+      display:flex; flex-direction:column; gap:5px;
+      cursor:pointer; z-index:120;
+    }
+    .nav-toggle span{ width:22px; height:1px; background:var(--gold); }
+    .cat-grid, .products-grid, .why-grid, .test-grid{ grid-template-columns:1fr; }
+    .footer-grid{ grid-template-columns:1fr; gap:36px; }
+    section{ padding:90px 6vw; }
+  }
+  /* ---------- about page ---------- */
+  .page-banner{
+    padding:160px 6vw 70px;
+    text-align:center;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.10), transparent 60%),
+      var(--black);
+    border-bottom:1px solid var(--hairline);
+  }
+  .page-banner h1{ font-size:clamp(2.2rem, 5vw, 3.2rem); margin-top:16px; }
+
+  .founder-section{
+    display:grid;
+    grid-template-columns:0.85fr 1.15fr;
+    gap:64px;
+    align-items:center;
+  }
+  .founder-photo-wrap{
+    position:relative;
+    max-width:380px;
+    margin:0 auto;
+  }
+  .founder-photo-wrap::before{
+    content:"";
+    position:absolute;
+    inset:-14px;
+    border:1px solid var(--gold);
+    border-radius:6px;
+    opacity:0.6;
+  }
+  .founder-photo{
+    border-radius:4px;
+    border:1px solid var(--hairline);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.5);
+    filter:grayscale(0.08) contrast(1.03);
+  }
+  .founder-name{
+    margin-top:24px;
+    text-align:center;
+    font-family:'Playfair Display', serif;
+    font-size:1.15rem;
+  }
+  .founder-title{
+    text-align:center;
+    font-size:0.72rem;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-top:6px;
+  }
+  .founder-copy h2{ font-size:clamp(1.7rem, 3vw, 2.3rem); margin-bottom:22px; line-height:1.25; }
+  .founder-copy p{ color:var(--cream-dim); line-height:1.85; margin-bottom:18px; font-size:0.98rem; }
+  .founder-copy .quote{
+    margin-top:26px;
+    padding-left:22px;
+    border-left:2px solid var(--gold);
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:1.2rem;
+    color:var(--cream);
+  }
+
+  .values-strip{ background:var(--black-2); }
+
+  .about-cta{
+    text-align:center;
+    padding:110px 6vw;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.12), transparent 65%),
+      var(--black);
+    border-top:1px solid var(--hairline);
+  }
+  .about-cta h2{ font-size:clamp(1.9rem, 3.6vw, 2.6rem); margin-bottom:18px; }
+  .about-cta p{ color:var(--cream-dim); max-width:460px; margin:0 auto 34px; line-height:1.7; }
+
+  @media (max-width:900px){
+    .founder-section{ grid-template-columns:1fr; gap:40px; }
+  }
+</style>
+</head>
+<body>
+
+<header id="siteHeader">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+      <path d="M4 8L6 4h12l2 4M4 8v9a1 1 0 001 1h14a1 1 0 001-1V8M4 8h16" stroke="#D4AF37"/>
+      <path d="M9 9l1.5 1.5L9 12" stroke="#D4AF37"/>
+    </svg>
+    <span>SAMADII4KT <span class="luxe">Luxe</span></span>
+  </div>
+  <div class="header-right">
+    <nav id="siteNav">
+      <a href="index.html#collections">Collections</a>
+      <a href="index.html#design">Design Yours</a>
+      <a href="about.html" style="color:var(--gold);">About</a>
+      <a href="index.html#gallery">Gallery</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <div class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">
+      <div class="knob">
+        <svg id="knobIcon" viewBox="0 0 24 24" fill="none" stroke="#0a0908" stroke-width="2">
+          <path d="M21 12.5A8.5 8.5 0 1111.5 3 6.5 6.5 0 0021 12.5z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
+  </div>
+</header>
+
+
+<section class="page-banner">
+  <span class="eyebrow">Our Story</span>
+  <h1>Behind Every Pair</h1>
+</section>
+
+<section id="story">
+  <div class="container">
+    <div class="founder-section">
+      <div>
+        <div class="founder-photo-wrap">
+          <img src="assets/founder.jpg" alt="Samad Olatundun, Founder of Samadii4KT Luxe" class="founder-photo">
+        </div>
+        <div class="founder-name">Samad Olatundun</div>
+        <div class="founder-title">Founder</div>
+      </div>
+      <div class="founder-copy">
+        <span class="eyebrow">Meet The Founder</span>
+        <h2 style="margin-top:16px;">Built On Craft, Not Shortcuts</h2>
+        <p>Samadii4KT Luxe started with a simple frustration: too many "premium" shoes in the market were premium in price only. Samad set out to build a brand where every pair earns the name — real materials, real construction, real attention to detail.</p>
+        <p>What began as a small operation has grown into a name trusted for handcrafted footwear that holds up to daily life while still turning heads in the room. Every order, from ready-made to fully custom designs, passes through the same standard the brand was built on.</p>
+        <div class="quote">"A shoe should carry you with confidence — not just cover your feet."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="values-strip" id="values">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">What We Stand For</span>
+      <h2>Our Values</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-item">
+        <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.4"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5z"/></svg></div>
+        <h3>Premium Quality</h3>
+        <p>No cut corners — genuine materials and construction built to last.</p>
+      </div>
+      <div class="why-item">
+        <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.4"><path d="M12 3l9 4.5v9L12 21l-9-4.5v-9L12 3z"/></svg></div>
+        <h3>Timeless Style</h3>
+        <p>Designs rooted in class, not fleeting trends.</p>
+      </div>
+      <div class="why-item">
+        <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.4"><path d="M4 12l5 5L20 6"/></svg></div>
+        <h3>Built On Trust</h3>
+        <p>Clear communication, honest delivery, and pairs that match what was promised.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about-cta">
+  <div class="container">
+    <span class="eyebrow">Ready?</span>
+    <h2 style="margin-top:14px;">Step In Class Today</h2>
+    <p>Browse the collection or bring us your own design — either way, you're getting a pair built with intention.</p>
+    <div class="hero-ctas" style="justify-content:center;">
+      <a href="index.html#collections" class="btn btn-gold">Shop The Collection</a>
+      <a href="index.html#design" class="btn btn-outline">Design Your Own</a>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.4"><path d="M4 8L6 4h12l2 4M4 8v9a1 1 0 001 1h14a1 1 0 001-1V8M4 8h16"/></svg>
+          <span>SAMADII4KT <span class="luxe">Luxe</span></span>
+        </div>
+        <p>Step in Class. Walk in Power. Premium handcrafted footwear built for those who don't settle.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="index.html#collections">Collections</a>
+        <a href="index.html#design">Design Yours</a>
+        <a href="about.html">About Us</a>
+        <a href="index.html#gallery">Gallery</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <a href="https://wa.me/2348100225001">WhatsApp: 08100225001</a>
+        <a href="mailto:olatundunsamad35@gmail.com">olatundunsamad35@gmail.com</a>
+        <a href="https://instagram.com/samadii4kt_luxe" target="_blank">@samadii4kt_luxe</a>
+      </div>
+    </div>
+    <div class="social-row">
+      <a href="https://instagram.com/samadii4kt_luxe" target="_blank" aria-label="Instagram" class="social-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+      </a>
+      <a href="https://wa.me/2348100225001" target="_blank" aria-label="WhatsApp" class="social-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.07-1.33C8.5 21.5 10.2 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.65 0-3.2-.45-4.53-1.24l-.32-.19-3.01.79.8-2.93-.21-.3C4.5 15.05 4 13.56 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/></svg>
+      </a>
+      <a href="mailto:olatundunsamad35@gmail.com" aria-label="Email" class="social-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      </a>
+      <a href="#" target="_blank" aria-label="Facebook" class="social-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 9h3V6h-3c-1.66 0-3 1.34-3 3v2H9v3h2v6h3v-6h3l1-3h-4V9c0-.55.45-1 1-1z"/></svg>
+      </a>
+      <a href="#" target="_blank" aria-label="TikTok" class="social-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 3v11.5a3.5 3.5 0 11-3.5-3.5c.36 0 .7.05 1 .15V8a6 6 0 106 6V8.5a6 6 0 003.5 1.5V7c-1.66 0-3-1.34-3.5-2.5-.3-.7-.5-1.5-.5-2.5h-3z"/></svg>
+      </a>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Samadii4KT Luxe. All rights reserved.</span>
+      <span>Premium Quality · Timeless Style</span>
+    </div>
+  </div>
+</footer>
+
+<a href="https://wa.me/2348100225001" class="wa-float" target="_blank" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="#0a0908"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.07-1.33C8.5 21.5 10.2 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.65 0-3.2-.45-4.53-1.24l-.32-.19-3.01.79.8-2.93-.21-.3C4.5 15.05 4 13.56 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.4c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41-.14 0-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.58.18 1.1.16 1.52.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg>
+</a>
+
+<script>
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  const navToggle = document.getElementById('navToggle');
+  const nav = document.getElementById('siteNav');
+  navToggle.addEventListener('click', () => nav.classList.toggle('open'));
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
+
+  const themeToggle = document.getElementById('themeToggle');
+  const knobIcon = document.getElementById('knobIcon');
+  const moonPath = 'M21 12.5A8.5 8.5 0 1111.5 3 6.5 6.5 0 0021 12.5z';
+  const sunPath = 'M12 4V2M12 22v-2M4 12H2M22 12h-2M5.6 5.6L4.2 4.2M19.8 19.8l-1.4-1.4M18.4 5.6l1.4-1.4M4.2 19.8l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z';
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    knobIcon.querySelector('path').setAttribute('d', isLight ? sunPath : moonPath);
+  });
+</script>
+
+</body>
+</html>
