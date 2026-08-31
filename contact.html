@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -200,6 +199,24 @@
     display:flex;
     align-items:center;
     gap:34px;
+  }
+
+  .cart-icon-link{
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--cream);
+    width:24px; height:24px;
+    transition:color 0.3s ease;
+  }
+  .cart-icon-link:hover{ color:var(--gold); }
+  .cart-icon-link svg{ width:22px; height:22px; }
+  .cart-badge{
+    position:absolute; top:-8px; right:-9px;
+    background:linear-gradient(120deg, var(--gold-light), var(--gold) 60%, var(--gold-deep));
+    color:#0a0908;
+    font-size:0.62rem; font-weight:600;
+    width:16px; height:16px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
   }
 
   nav{ display:flex; gap:38px; }  nav a{
@@ -1075,6 +1092,10 @@
       <a href="gallery.html">Gallery</a>
       <a href="contact.html" style="color:var(--gold);">Contact</a>
     </nav>
+    <a href="cart.html" class="cart-icon-link" title="View Cart" aria-label="View Cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 3h2l2.4 12.4a2 2 0 002 1.6h8.2a2 2 0 002-1.9L21 7H6"/></svg>
+      <span class="cart-badge">2</span>
+    </a>
     <div class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">
       <div class="knob">
         <svg id="knobIcon" viewBox="0 0 24 24" fill="none" stroke="#0a0908" stroke-width="2">
@@ -1157,24 +1178,24 @@
           <span class="eyebrow">Send A Message</span>
           <h2 style="margin-top:12px;">We'd Love To Hear From You</h2>
         </div>
-        <form class="design-form" style="border:none; background:none; padding:0;">
+        <form class="design-form" id="contactForm" style="border:none; background:none; padding:0;">
           <div class="form-row">
             <div class="field">
               <label>Full Name</label>
-              <input type="text" placeholder="Your name">
+              <input type="text" name="name" placeholder="Your name" required>
             </div>
             <div class="field">
               <label>Phone / WhatsApp</label>
-              <input type="text" placeholder="e.g. 0810 000 0000">
+              <input type="text" name="phone" placeholder="e.g. 0810 000 0000" required>
             </div>
           </div>
           <div class="field">
             <label>Email</label>
-            <input type="text" placeholder="you@example.com">
+            <input type="text" name="email" placeholder="you@example.com">
           </div>
           <div class="field">
             <label>Subject</label>
-            <select>
+            <select name="subject">
               <option>General Inquiry</option>
               <option>Order Support</option>
               <option>Custom Design Question</option>
@@ -1183,9 +1204,9 @@
           </div>
           <div class="field">
             <label>Message</label>
-            <textarea placeholder="How can we help?"></textarea>
+            <textarea name="message" placeholder="How can we help?" required></textarea>
           </div>
-          <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;">Send Message</button>
+          <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;" id="contactSubmitBtn">Send Message</button>
         </form>
       </div>
 
@@ -1210,6 +1231,8 @@
         <a href="design.html">Design Yours</a>
         <a href="about.html">About Us</a>
         <a href="gallery.html">Gallery</a>
+        <a href="cart.html">Cart</a>
+        <a href="track-order.html">Track My Order</a>
       </div>
       <div class="footer-col">
         <h4>Contact</h4>
@@ -1247,6 +1270,10 @@
 </a>
 
 <script>
+  // Backend API base URL — update this once the backend is deployed live.
+  // For local testing, run the backend (npm start) and keep this as-is.
+  const API_BASE = 'https://shoemaker.onrender.com/api';
+
   const header = document.getElementById('siteHeader');
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 40);
@@ -1276,15 +1303,41 @@
     });
   });
 
-  // Design form placeholder (will connect to backend later)
-  const designForm = document.querySelector('.design-form');
-  if (designForm) {
-    designForm.addEventListener('submit', (e) => {
+  // Contact form — sends to the backend API
+  const contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      alert("Thanks for reaching out! Once the backend is connected this will send straight to us. For now, feel free to message us directly on WhatsApp.");
+      const btn = document.getElementById('contactSubmitBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Sending...';
+      btn.style.pointerEvents = 'none';
+
+      const formData = new FormData(contactForm);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch(`${API_BASE}/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(data.message || 'Thanks! Your message has been sent.');
+          contactForm.reset();
+        } else {
+          alert(data.error || 'Something went wrong. Please try again or message us on WhatsApp.');
+        }
+      } catch (err) {
+        alert("We couldn't reach the server right now. Please message us directly on WhatsApp instead.");
+      } finally {
+        btn.textContent = originalText;
+        btn.style.pointerEvents = 'auto';
+      }
     });
   }
 </script>
 
 </body>
-</html>
+      </html>
