@@ -1,13 +1,16 @@
-
 // Simple JSON-file "database". No external database server needed to get started.
 // Each collection is stored as its own .json file inside /data.
-// Good enough for a small business site; can be swapped for a real database later
-// without changing the route files much (same read/write function names).
 
 const fs = require('fs');
 const path = require('path');
 
 const DATA_DIR = path.join(__dirname, 'data');
+
+// Make sure the data folder exists — it won't be there after a fresh
+// deploy since empty folders aren't stored in git.
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
 
 function filePath(collection) {
   return path.join(DATA_DIR, `${collection}.json`);
