@@ -201,6 +201,24 @@
     gap:34px;
   }
 
+  .cart-icon-link{
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--cream);
+    width:24px; height:24px;
+    transition:color 0.3s ease;
+  }
+  .cart-icon-link:hover{ color:var(--gold); }
+  .cart-icon-link svg{ width:22px; height:22px; }
+  .cart-badge{
+    position:absolute; top:-8px; right:-9px;
+    background:linear-gradient(120deg, var(--gold-light), var(--gold) 60%, var(--gold-deep));
+    color:#0a0908;
+    font-size:0.62rem; font-weight:600;
+    width:16px; height:16px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+
   nav{ display:flex; gap:38px; }  nav a{
     font-size:0.78rem;
     letter-spacing:0.14em;
@@ -912,6 +930,10 @@
       <a href="gallery.html">Gallery</a>
       <a href="contact.html">Contact</a>
     </nav>
+    <a href="cart.html" class="cart-icon-link" title="View Cart" aria-label="View Cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 3h2l2.4 12.4a2 2 0 002 1.6h8.2a2 2 0 002-1.9L21 7H6"/></svg>
+      <span class="cart-badge">2</span>
+    </a>
     <div class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">
       <div class="knob">
         <svg id="knobIcon" viewBox="0 0 24 24" fill="none" stroke="#0a0908" stroke-width="2">
@@ -935,26 +957,32 @@
       <div class="admin-lock">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
         <div style="font-family:'Playfair Display', serif; font-size:1.1rem;">Owner Access Only</div>
-        <p>This page is for Samad to add new finished-work photos to the public Gallery. Once the backend is connected, this form will require a login and save directly to the live site.</p>
+        <p>Enter your admin password to add new finished-work photos to the public Gallery.</p>
       </div>
 
-      <form class="upload-form">
+      <form class="upload-form" id="uploadWorkForm">
+        <div class="field">
+          <label>Admin Password</label>
+          <input type="password" id="adminKeyInput" placeholder="Your admin password" required>
+        </div>
+
         <div class="field">
           <label>Photo</label>
-          <div class="dropzone">
+          <div class="dropzone" id="uploadDropzone">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
-            <div>Click to upload or drag a photo here</div>
+            <div id="uploadDropzoneLabel">Click to upload or drag a photo here</div>
           </div>
+          <input type="file" id="photoInput" name="photo" accept="image/*" style="display:none;" required>
         </div>
 
         <div class="field">
           <label>Title</label>
-          <input type="text" placeholder="e.g. The Ikeja Classic — Oxford">
+          <input type="text" id="workTitle" placeholder="e.g. The Ikeja Classic — Oxford" required>
         </div>
 
         <div class="field">
           <label>Category</label>
-          <select>
+          <select id="workCategory">
             <option>Men's</option>
             <option>Women's</option>
             <option>Native</option>
@@ -964,20 +992,20 @@
 
         <div class="field">
           <label>Price</label>
-          <input type="text" placeholder="e.g. ₦45,000 or From ₦60,000 for bespoke">
+          <input type="text" id="workPrice" placeholder="e.g. ₦45,000 or From ₦60,000 for bespoke">
         </div>
 
         <div class="field">
           <label>Location</label>
-          <input type="text" placeholder="e.g. Lagos, Nigeria or client's delivery city">
+          <input type="text" id="workLocation" placeholder="e.g. Lagos, Nigeria or client's delivery city">
         </div>
 
         <div class="field">
           <label>Short Description (optional)</label>
-          <textarea placeholder="A short note about this piece — material, client request, or story behind it."></textarea>
+          <textarea id="workDescription" placeholder="A short note about this piece — material, client request, or story behind it."></textarea>
         </div>
 
-        <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;">Add To Gallery</button>
+        <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;" id="uploadSubmitBtn">Add To Gallery</button>
       </form>
 
     </div>
@@ -1001,6 +1029,8 @@
         <a href="design.html">Design Yours</a>
         <a href="about.html">About Us</a>
         <a href="gallery.html">Gallery</a>
+        <a href="cart.html">Cart</a>
+        <a href="track-order.html">Track My Order</a>
       </div>
       <div class="footer-col">
         <h4>Contact</h4>
@@ -1038,6 +1068,8 @@
 </a>
 
 <script>
+  const API_BASE = 'https://shoemaker.onrender.com/api';
+
   const header = document.getElementById('siteHeader');
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 40);
@@ -1067,15 +1099,68 @@
     });
   });
 
-  // Upload form placeholder (will connect to backend later)
-  const uploadForm = document.querySelector('.upload-form');
-  if (uploadForm) {
-    uploadForm.addEventListener('submit', (e) => {
+  // Photo dropzone — click to choose a file, show the filename once picked
+  const uploadDropzone = document.getElementById('uploadDropzone');
+  const photoInput = document.getElementById('photoInput');
+  const uploadDropzoneLabel = document.getElementById('uploadDropzoneLabel');
+  if (uploadDropzone && photoInput) {
+    uploadDropzone.addEventListener('click', () => photoInput.click());
+    photoInput.addEventListener('change', () => {
+      if (photoInput.files[0]) {
+        uploadDropzoneLabel.textContent = `Selected: ${photoInput.files[0].name}`;
+      }
+    });
+  }
+
+  // Upload Work form — sends to the backend API (owner-only, needs admin password)
+  const uploadWorkForm = document.getElementById('uploadWorkForm');
+  if (uploadWorkForm) {
+    uploadWorkForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      alert('This form will save to the live Gallery once the backend is connected. For now, send the photo and details directly on WhatsApp.');
+
+      if (!photoInput.files[0]) {
+        alert('Please choose a photo to upload.');
+        return;
+      }
+
+      const btn = document.getElementById('uploadSubmitBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Uploading...';
+      btn.style.pointerEvents = 'none';
+
+      const formData = new FormData();
+      formData.append('photo', photoInput.files[0]);
+      formData.append('title', document.getElementById('workTitle').value);
+      formData.append('category', document.getElementById('workCategory').value);
+      formData.append('price', document.getElementById('workPrice').value);
+      formData.append('location', document.getElementById('workLocation').value);
+      formData.append('description', document.getElementById('workDescription').value);
+
+      try {
+        const res = await fetch(`${API_BASE}/gallery`, {
+          method: 'POST',
+          headers: { 'x-admin-key': document.getElementById('adminKeyInput').value },
+          body: formData,
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert('Added to the Gallery successfully!');
+          uploadWorkForm.reset();
+          uploadDropzoneLabel.textContent = 'Click to upload or drag a photo here';
+        } else if (res.status === 401) {
+          alert('Incorrect admin password. Please try again.');
+        } else {
+          alert(data.error || 'Something went wrong. Please try again.');
+        }
+      } catch (err) {
+        alert("We couldn't reach the server right now. Please try again shortly.");
+      } finally {
+        btn.textContent = originalText;
+        btn.style.pointerEvents = 'auto';
+      }
     });
   }
 </script>
 
 </body>
-</html>
+  </html>
