@@ -201,6 +201,24 @@
     gap:34px;
   }
 
+  .cart-icon-link{
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--cream);
+    width:24px; height:24px;
+    transition:color 0.3s ease;
+  }
+  .cart-icon-link:hover{ color:var(--gold); }
+  .cart-icon-link svg{ width:22px; height:22px; }
+  .cart-badge{
+    position:absolute; top:-8px; right:-9px;
+    background:linear-gradient(120deg, var(--gold-light), var(--gold) 60%, var(--gold-deep));
+    color:#0a0908;
+    font-size:0.62rem; font-weight:600;
+    width:16px; height:16px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+
   nav{ display:flex; gap:38px; }  nav a{
     font-size:0.78rem;
     letter-spacing:0.14em;
@@ -1012,6 +1030,10 @@
     <nav id="siteNav">
       <a href="shop.html">Collections</a>
       <a href="design.html" style="color:var(--gold);">Design Yours</a>
+    <a href="cart.html" class="cart-icon-link" title="View Cart" aria-label="View Cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 3h2l2.4 12.4a2 2 0 002 1.6h8.2a2 2 0 002-1.9L21 7H6"/></svg>
+      <span class="cart-badge">2</span>
+    </a>
     <div class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">
       <div class="knob">
         <svg id="knobIcon" viewBox="0 0 24 24" fill="none" stroke="#0a0908" stroke-width="2">
@@ -1032,26 +1054,26 @@
   <div class="container">
     <div class="design-layout">
 
-      <form class="design-form">
+      <form class="design-form" id="designRequestForm">
 
         <div class="field">
           <label>Shoe Type</label>
-          <div class="shoe-type-grid">
-            <div class="shoe-type-opt active">Sneaker</div>
-            <div class="shoe-type-opt">Sandal</div>
-            <div class="shoe-type-opt">Native</div>
-            <div class="shoe-type-opt">Boot</div>
-            <div class="shoe-type-opt">Oxford</div>
-            <div class="shoe-type-opt">Loafer</div>
-            <div class="shoe-type-opt">Heel</div>
-            <div class="shoe-type-opt">Other</div>
+          <div class="shoe-type-grid" id="shoeTypeGrid">
+            <div class="shoe-type-opt active" data-value="Sneaker">Sneaker</div>
+            <div class="shoe-type-opt" data-value="Sandal">Sandal</div>
+            <div class="shoe-type-opt" data-value="Native">Native</div>
+            <div class="shoe-type-opt" data-value="Boot">Boot</div>
+            <div class="shoe-type-opt" data-value="Oxford">Oxford</div>
+            <div class="shoe-type-opt" data-value="Loafer">Loafer</div>
+            <div class="shoe-type-opt" data-value="Heel">Heel</div>
+            <div class="shoe-type-opt" data-value="Other">Other</div>
           </div>
         </div>
 
         <div class="form-row">
           <div class="field">
             <label>Size</label>
-            <select>
+            <select name="size">
               <option>38</option><option>39</option><option>40</option>
               <option>41</option><option>42</option><option>43</option>
               <option>44</option><option>45</option><option>46</option>
@@ -1059,7 +1081,7 @@
           </div>
           <div class="field">
             <label>Budget Range</label>
-            <select>
+            <select name="budgetRange">
               <option>₦30,000 – ₦50,000</option>
               <option>₦50,000 – ₦80,000</option>
               <option>₦80,000 – ₦120,000</option>
@@ -1071,39 +1093,40 @@
         <div class="form-row">
           <div class="field">
             <label>Preferred Color / Material</label>
-            <input type="text" placeholder="e.g. Black suede, brown leather, ankara print">
+            <input type="text" name="colorMaterial" placeholder="e.g. Black suede, brown leather, ankara print">
           </div>
           <div class="field">
             <label>Delivery Date Needed</label>
-            <input type="date">
+            <input type="date" name="deliveryDate">
           </div>
         </div>
 
         <div class="field">
           <label>Reference Image (optional)</label>
-          <div class="design-dropzone">
+          <div class="design-dropzone" id="designDropzone">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
-            <div>Upload a photo of the design you have in mind</div>
+            <div id="dropzoneLabel">Upload a photo of the design you have in mind</div>
           </div>
+          <input type="file" id="referenceImageInput" name="referenceImage" accept="image/*" style="display:none;">
         </div>
 
         <div class="field">
           <label>Description / Notes</label>
-          <textarea placeholder="Tell us more about what you're picturing — style details, occasion, anything specific."></textarea>
+          <textarea name="notes" placeholder="Tell us more about what you're picturing — style details, occasion, anything specific."></textarea>
         </div>
 
         <div class="form-row">
           <div class="field">
             <label>Full Name</label>
-            <input type="text" placeholder="Your name">
+            <input type="text" name="fullName" placeholder="Your name" required>
           </div>
           <div class="field">
             <label>Phone / WhatsApp</label>
-            <input type="text" placeholder="e.g. 0810 000 0000">
+            <input type="text" name="phone" placeholder="e.g. 0810 000 0000" required>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;">Submit Design Request</button>
+        <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;" id="designSubmitBtn">Submit Design Request</button>
         <p class="field-note" style="text-align:center; margin-top:16px;">We'll reach out on WhatsApp within 24 hours to confirm your design.</p>
       </form>
 
@@ -1172,6 +1195,8 @@
         <a href="design.html">Design Yours</a>
         <a href="about.html">About Us</a>
         <a href="gallery.html">Gallery</a>
+        <a href="cart.html">Cart</a>
+        <a href="track-order.html">Track My Order</a>
       </div>
       <div class="footer-col">
         <h4>Contact</h4>
@@ -1209,6 +1234,8 @@
 </a>
 
 <script>
+  const API_BASE = 'https://shoemaker.onrender.com/api';
+
   const header = document.getElementById('siteHeader');
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 40);
@@ -1230,23 +1257,67 @@
     knobIcon.querySelector('path').setAttribute('d', isLight ? sunPath : moonPath);
   });
 
-  // Shoe type selector
+  // Shoe type selector — track the chosen value for submission
+  let selectedShoeType = 'Sneaker';
   document.querySelectorAll('.shoe-type-opt').forEach(opt => {
     opt.addEventListener('click', () => {
       document.querySelectorAll('.shoe-type-opt').forEach(o => o.classList.remove('active'));
       opt.classList.add('active');
+      selectedShoeType = opt.dataset.value;
     });
   });
 
-  // Design form placeholder (will connect to backend later)
-  const designForm = document.querySelector('.design-form');
-  if (designForm) {
-    designForm.addEventListener('submit', (e) => {
+  // Reference image dropzone — click to choose a file, show the filename once picked
+  const dropzone = document.getElementById('designDropzone');
+  const fileInput = document.getElementById('referenceImageInput');
+  const dropzoneLabel = document.getElementById('dropzoneLabel');
+  if (dropzone && fileInput) {
+    dropzone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) {
+        dropzoneLabel.textContent = `Selected: ${fileInput.files[0].name}`;
+      }
+    });
+  }
+
+  // Design request form — sends to the backend API (multipart, because of the optional image)
+  const designRequestForm = document.getElementById('designRequestForm');
+  if (designRequestForm) {
+    designRequestForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      alert("Thanks! Once the backend is connected this will send straight to us. For now, feel free to message your design details on WhatsApp and we'll get started.");
+      const btn = document.getElementById('designSubmitBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Submitting...';
+      btn.style.pointerEvents = 'none';
+
+      const formData = new FormData(designRequestForm);
+      formData.set('shoeType', selectedShoeType);
+
+      try {
+        const res = await fetch(`${API_BASE}/design-requests`, {
+          method: 'POST',
+          body: formData, // no Content-Type header — browser sets the multipart boundary itself
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(data.message || "Thanks! We'll reach out on WhatsApp within 24 hours.");
+          designRequestForm.reset();
+          dropzoneLabel.textContent = 'Upload a photo of the design you have in mind';
+          document.querySelectorAll('.shoe-type-opt').forEach(o => o.classList.remove('active'));
+          document.querySelector('.shoe-type-opt[data-value="Sneaker"]').classList.add('active');
+          selectedShoeType = 'Sneaker';
+        } else {
+          alert(data.error || 'Something went wrong. Please try again or message us on WhatsApp.');
+        }
+      } catch (err) {
+        alert("We couldn't reach the server right now. Please message your design details directly on WhatsApp instead.");
+      } finally {
+        btn.textContent = originalText;
+        btn.style.pointerEvents = 'auto';
+      }
     });
   }
 </script>
 
 </body>
-</html>
+  </html>
