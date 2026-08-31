@@ -1274,7 +1274,7 @@
     <div class="cart-layout">
       <div>
 
-        <div class="cart-item">
+        <div class="cart-item" data-name="The Ikeja Classic" data-price="45000" data-size="41" data-color="Black">
           <div class="ci-img"><svg viewBox="0 0 140 60" fill="none"><path d="M8 46c0-6 4-9 10-11l22-8c5-2 8-6 11-10 3-4 7-6 12-6 6 0 9 4 9 9v6c8 0 16 2 22 8 4 4 6 9 6 14 0 3-2 6-5 6H12c-3 0-4-2-4-4v-4z" stroke="#D4AF37" stroke-width="1.3"/><path d="M8 46h124" stroke="#D4AF37" stroke-width="1.3"/></svg></div>
           <div class="ci-info">
             <h4>The Ikeja Classic</h4>
@@ -1291,7 +1291,7 @@
           </div>
         </div>
 
-        <div class="cart-item">
+        <div class="cart-item" data-name="The Regent Loafer" data-price="38500" data-size="42" data-color="Brown">
           <div class="ci-img"><svg viewBox="0 0 140 60" fill="none"><path d="M8 46c0-6 4-9 10-11l22-8c5-2 8-6 11-10 3-4 7-6 12-6 6 0 9 4 9 9v6c8 0 16 2 22 8 4 4 6 9 6 14 0 3-2 6-5 6H12c-3 0-4-2-4-4v-4z" stroke="#D4AF37" stroke-width="1.3"/><path d="M8 46h124" stroke="#D4AF37" stroke-width="1.3"/></svg></div>
           <div class="ci-info">
             <h4>The Regent Loafer</h4>
@@ -1337,33 +1337,33 @@
           <div class="form-row">
             <div class="field">
               <label>Full Name</label>
-              <input type="text" placeholder="Your full name">
+              <input type="text" name="fullName" placeholder="Your full name" required>
             </div>
             <div class="field">
               <label>Phone / WhatsApp</label>
-              <input type="text" placeholder="e.g. 0810 000 0000">
+              <input type="text" name="phone" placeholder="e.g. 0810 000 0000" required>
             </div>
           </div>
 
           <div class="field">
             <label>Delivery Address</label>
-            <textarea placeholder="Street address, area, city, state"></textarea>
+            <textarea name="address" placeholder="Street address, area, city, state" required></textarea>
           </div>
 
           <div class="form-row">
             <div class="field">
               <label>City</label>
-              <input type="text" placeholder="e.g. Ikeja">
+              <input type="text" name="city" placeholder="e.g. Ikeja">
             </div>
             <div class="field">
               <label>State</label>
-              <input type="text" placeholder="e.g. Lagos">
+              <input type="text" name="state" placeholder="e.g. Lagos">
             </div>
           </div>
 
           <div class="field">
             <label>Order Notes (optional)</label>
-            <textarea placeholder="Landmark, delivery instructions, preferred time..."></textarea>
+            <textarea name="notes" placeholder="Landmark, delivery instructions, preferred time..."></textarea>
           </div>
 
           <div class="rider-note">
@@ -1377,15 +1377,15 @@
             <label>Payment Method</label>
             <div class="payment-options">
               <label class="payment-opt active">
-                <input type="radio" name="pay" checked>
+                <input type="radio" name="paymentMethod" value="Pay on Delivery" form="checkoutForm" checked>
                 <span>Pay on Delivery</span>
               </label>
               <label class="payment-opt">
-                <input type="radio" name="pay">
+                <input type="radio" name="paymentMethod" value="Bank Transfer" form="checkoutForm">
                 <span>Bank Transfer</span>
               </label>
               <label class="payment-opt">
-                <input type="radio" name="pay">
+                <input type="radio" name="paymentMethod" value="Pay via WhatsApp (Card Link)" form="checkoutForm">
                 <span>Pay via WhatsApp (Card Link)</span>
               </label>
             </div>
@@ -1393,10 +1393,10 @@
 
           <div class="order-summary" style="position:static;">
             <h3>Order Total</h3>
-            <div class="os-row"><span>Subtotal</span><span>₦122,000</span></div>
+            <div class="os-row"><span>Subtotal</span><span id="cartSubtotalDisplay">₦122,000</span></div>
             <div class="os-row"><span>Delivery</span><span>₦2,500</span></div>
-            <div class="os-row total"><span>Total</span><span class="amount">₦124,500</span></div>
-            <button type="submit" form="checkoutForm" class="btn btn-gold checkout-submit" style="width:100%; justify-content:center; margin-top:20px;">Place Order</button>
+            <div class="os-row total"><span>Total</span><span class="amount" id="cartTotalDisplay">₦124,500</span></div>
+            <button type="submit" form="checkoutForm" class="btn btn-gold checkout-submit" style="width:100%; justify-content:center; margin-top:20px;" id="placeOrderBtn">Place Order</button>
             <p class="field-note" style="text-align:center; margin-top:14px;">By placing your order you agree to be contacted on WhatsApp to confirm details.</p>
           </div>
         </div>
@@ -1462,6 +1462,46 @@
 </a>
 
 <script>
+  const API_BASE = 'https://shoemaker.onrender.com/api';
+  const DELIVERY_FEE = 2500;
+
+  function formatNaira(n) {
+    return '₦' + n.toLocaleString('en-NG');
+  }
+
+  function recalcCart() {
+    let subtotal = 0;
+    document.querySelectorAll('.cart-item').forEach(item => {
+      if (item.style.opacity === '0.3') return; // removed items don't count
+      const price = parseInt(item.dataset.price, 10);
+      const qty = parseInt(item.querySelector('.ci-qty span').textContent, 10);
+      const lineTotal = price * qty;
+      item.querySelector('.ci-price .amount').textContent = formatNaira(lineTotal);
+      subtotal += lineTotal;
+    });
+    const total = subtotal + DELIVERY_FEE;
+    const subtotalEls = document.getElementById('cartSubtotalDisplay');
+    const totalEls = document.getElementById('cartTotalDisplay');
+    if (subtotalEls) subtotalEls.textContent = formatNaira(subtotal);
+    if (totalEls) totalEls.textContent = formatNaira(total);
+    return { subtotal, total };
+  }
+
+  function collectCartItems() {
+    const items = [];
+    document.querySelectorAll('.cart-item').forEach(item => {
+      if (item.style.opacity === '0.3') return;
+      items.push({
+        name: item.dataset.name,
+        price: parseInt(item.dataset.price, 10),
+        size: item.dataset.size,
+        color: item.dataset.color,
+        qty: parseInt(item.querySelector('.ci-qty span').textContent, 10),
+      });
+    });
+    return items;
+  }
+
   const header = document.getElementById('siteHeader');
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 40);
@@ -1488,6 +1528,7 @@
     btn.addEventListener('click', () => {
       const span = btn.previousElementSibling;
       span.textContent = parseInt(span.textContent) + 1;
+      recalcCart();
     });
   });
   document.querySelectorAll('.ci-minus').forEach(btn => {
@@ -1495,6 +1536,7 @@
       const span = btn.nextElementSibling;
       const val = parseInt(span.textContent);
       if (val > 1) span.textContent = val - 1;
+      recalcCart();
     });
   });
 
@@ -1503,6 +1545,7 @@
     el.addEventListener('click', () => {
       el.closest('.cart-item').style.opacity = '0.3';
       el.textContent = 'Removed';
+      recalcCart();
     });
   });
 
@@ -1515,12 +1558,49 @@
     });
   });
 
-  // Checkout form placeholder (will connect to backend later)
+  // Initial totals calculation on page load
+  recalcCart();
+
+  // Checkout form — sends the order to the backend API
   const checkoutForm = document.getElementById('checkoutForm');
   if (checkoutForm) {
-    checkoutForm.addEventListener('submit', (e) => {
+    checkoutForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      alert("Thanks! Once the backend is connected, this will place your order and notify us instantly. For now, feel free to confirm your order directly on WhatsApp.");
+
+      const items = collectCartItems();
+      if (items.length === 0) {
+        alert('Your cart is empty — add an item before checking out.');
+        return;
+      }
+
+      const btn = document.getElementById('placeOrderBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Placing Order...';
+      btn.style.pointerEvents = 'none';
+
+      const formData = new FormData(checkoutForm);
+      const payload = Object.fromEntries(formData.entries());
+      payload.items = items;
+
+      try {
+        const res = await fetch(`${API_BASE}/orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(`${data.message}\n\nYour Order ID: ${data.orderId}\n\nSave this ID to track your delivery on the Track My Order page.`);
+          checkoutForm.reset();
+        } else {
+          alert(data.error || 'Something went wrong placing your order. Please try again or confirm on WhatsApp.');
+        }
+      } catch (err) {
+        alert("We couldn't reach the server right now. Please confirm your order directly on WhatsApp instead.");
+      } finally {
+        btn.textContent = originalText;
+        btn.style.pointerEvents = 'auto';
+      }
     });
   }
 </script>
