@@ -1,62 +1,92 @@
-// Simple JSON-file "database". No external database server needed to get started.
-// Each collection is stored as its own .json file inside /data.
+// MongoDB connection + data models, using Mongoose.
+// Replaces the old JSON-file storage so data survives server restarts.
 
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 
-const DATA_DIR = path.join(__dirname, 'data');
-
-// Make sure the data folder exists — it won't be there after a fresh
-// deploy since empty folders aren't stored in git.
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-function filePath(collection) {
-  return path.join(DATA_DIR, `${collection}.json`);
-}
-
-function readCollection(collection) {
-  const file = filePath(collection);
-  if (!fs.existsSync(file)) {
-    fs.writeFileSync(file, '[]', 'utf-8');
+async function connect() {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    console.error('MONGODB_URI is not set. Add it as an environment variable.');
+    return;
   }
-  const raw = fs.readFileSync(file, 'utf-8');
   try {
-    return JSON.parse(raw);
+    await mongoose.connect(uri);
+    console.log('Connected to MongoDB');
   } catch (err) {
-    return [];
+    console.error('MongoDB connection error:', err.message);
   }
 }
 
-function writeCollection(collection, records) {
-  const file = filePath(collection);
-  fs.writeFileSync(file, JSON.stringify(records, null, 2), 'utf-8');
-}
+const ContactMessageSchema = new mongoose.Schema({
+  id: String,
+  name: String,
+  phone: String,
+  email: String,
+  subject: String,
+  message: String,
+  status: { type: String, default: 'new' },
+  createdAt: { type: Date, default: Date.now },
+});
 
-function insert(collection, record) {
-  const records = readCollection(collection);
-  records.push(record);
-  writeCollection(collection, records);
-  return record;
-}
+const DesignRequestSchema = new mongoose.Schema({
+  id: String,
+  shoeType: String,
+  size: String,
+  budgetRange: String,
+  colorMaterial: String,
+  deliveryDate: String,
+  notes: String,
+  fullName: String,
+  phone: String,
+  referenceImage: String,
+  status: { type: String, default: 'pending' },
+  createdAt: { type: Date, default: Date.now },
+});
 
-function findAll(collection) {
-  return readCollection(collection);
-}
+const OrderSchema = new mongoose.Schema({
+  id: String,
+  items: [
+    {
+      name: String,
+      size: String,
+      color: String,
+      qty: Number,
+      price: Number,
+    },
+  ],
+  subtotal: Number,
+  deliveryFee: Number,
+  total: Number,
+  fullName: String,
+  phone: String,
+  address: String,
+  city: String,
+  state: String,
+  notes: String,
+  paymentMethod: String,
+  status: { type: String, default: 'order_placed' },
+  rider: {
+    name: String,
+    phone: String,
+    eta: String,
+  },
+  createdAt: { type: Date, default: Date.now },
+});
 
-function findOne(collection, predicate) {
-  const records = readCollection(collection);
-  return records.find(predicate);
-}
+const GalleryItemSchema = new mongoose.Schema({
+  id: String,
+  title: String,
+  category: String,
+  price: String,
+  location: String,
+  description: String,
+  image: String,
+  createdAt: { type: Date, default: Date.now },
+});
 
-function updateOne(collection, predicate, updates) {
-  const records = readCollection(collection);
-  const idx = records.findIndex(predicate);
-  if (idx === -1) return null;
-  records[idx] = { ...records[idx], ...updates };
-  writeCollection(collection, records);
-  return records[idx];
-}
+const ContactMessage = mongoose.model('ContactMessage', ContactMessageSchema);
+const DesignRequest = mongoose.model('DesignRequest', DesignRequestSchema);
+const Order = mongoose.model('Order', OrderSchema);
+const GalleryItem = mongoose.model('GalleryItem', GalleryItemSchema);
 
-module.exports = { insert, findAll, findOne, updateOne };
+module.exports = { connect, ContactMessage, DesignRequest, Order, GalleryItem };
