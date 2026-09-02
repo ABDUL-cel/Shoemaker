@@ -1,24 +1,13 @@
 const express = require('express');
 const { nanoid } = require('nanoid');
 const multer = require('multer');
-const path = require('path');
-const db = require('../db');
+const { DesignRequest } = require('../db');
+const { uploadBufferToCloudinary } = require('../cloudinary');
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
 
-// Reference image upload storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `design-ref-${Date.now()}${ext}`);
-  },
-});
-const upload = multer({ storage, limits: { fileSize: 8 * 1024 * 1024 } }); // 8MB max
-
-// POST /api/design-requests — handles the "Design Your Own Shoe" form
-// Expects multipart/form-data because of the optional reference image.
-router.post('/', upload.single('referenceImage'), (req, res) => {
+router.post('/', upload.single('referenceImage'), async (req, res) => {
   const {
     shoeType, size, budgetRange, colorMaterial,
     deliveryDate, notes, fullName, phone,
@@ -28,35 +17,38 @@ router.post('/', upload.single('referenceImage'), (req, res) => {
     return res.status(400).json({ error: 'Name, phone, and shoe type are required.' });
   }
 
-  const record = {
-    id: nanoid(10),
-    shoeType,
-    size: size || '',
-    budgetRange: budgetRange || '',
-    colorMaterial: colorMaterial || '',
-    deliveryDate: deliveryDate || '',
-    notes: notes || '',
-    fullName,
-    phone,
-    referenceImage: req.file ? `/uploads/${req.file.filename}` : null,
-    status: 'pending', // pending -> confirmed -> in_production -> ready -> delivered
-    createdAt: new Date().toISOString(),
-  };
+  try {
+    let referenceImage = null;
+    if (req.file) {
+      referenceImage = await uploadBufferToCloudinary(req.file.buffer, 'samadii4kt/design-requests');
+    }
 
-  db.insert('design_requests', record);
+    const record = await DesignRequest.create({
+      id: nanoid(10),
+      shoeType,
+      size: size || '',
+      budgetRange: budgetRange || '',
+      colorMaterial: colorMaterial || '',
+      deliveryDate: deliveryDate || '',
+      notes: notes || '',
+      fullName,
+      phone,
+      referenceImage,
+    });
 
-  res.status(201).json({
-    success: true,
-    message: "Thanks! We'll reach out on WhatsApp within 24 hours to confirm your design.",
-    id: record.id,
-  });
+    res.status(201).json({
+      success: true,
+      message: "Thanks! We'll reach out on WhatsApp within 24 hours to confirm your design.",
+      id: record.id,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Something went wrong. Please try again.' });
+  }
 });
 
-// GET /api/design-requests — owner-side: list all custom design requests
-router.get('/', (req, res) => {
-  const requests = db.findAll('design_requests').sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
+router.get('/', async (req, res) => {
+  const requests = await DesignRequest.find().sort({ createdAt: -1 });
   res.json(requests);
 });
 
