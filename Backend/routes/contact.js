@@ -1,6 +1,7 @@
 const express = require('express');
 const { nanoid } = require('nanoid');
 const { ContactMessage } = require('../db');
+const { requireAdminKey } = require('../middleware');
 
 const router = express.Router();
 
@@ -28,7 +29,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
+router.get('/', requireAdminKey, async (req, res) => {
   const messages = await ContactMessage.find().sort({ createdAt: -1 });
   res.json(messages);
 });
