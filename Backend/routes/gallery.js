@@ -3,7 +3,7 @@ const { nanoid } = require('nanoid');
 const multer = require('multer');
 const { GalleryItem } = require('../db');
 const { uploadBufferToCloudinary } = require('../cloudinary');
-const { requireAdminKey } = require('../middleware');
+const { requireAdminKey } = require('middleware/middleware');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
