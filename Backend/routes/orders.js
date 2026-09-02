@@ -1,7 +1,7 @@
 const express = require('express');
 const { nanoid } = require('nanoid');
 const { Order } = require('../db');
-const { requireAdminKey } = require('../middleware');
+const { requireAdminKey } = require('middleware/middleware');
 
 const router = express.Router();
 
