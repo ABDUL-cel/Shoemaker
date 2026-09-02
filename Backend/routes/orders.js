@@ -1,6 +1,7 @@
 const express = require('express');
 const { nanoid } = require('nanoid');
 const { Order } = require('../db');
+const { requireAdminKey } = require('../middleware');
 
 const router = express.Router();
 
@@ -53,12 +54,12 @@ router.get('/:id', async (req, res) => {
   res.json(order);
 });
 
-router.get('/', async (req, res) => {
+router.get('/', requireAdminKey, async (req, res) => {
   const orders = await Order.find().sort({ createdAt: -1 });
   res.json(orders);
 });
 
-router.patch('/:id/status', async (req, res) => {
+router.patch('/:id/status', requireAdminKey, async (req, res) => {
   const { status, rider } = req.body;
   const updates = {};
   if (status) updates.status = status;
