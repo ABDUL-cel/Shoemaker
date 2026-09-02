@@ -3,17 +3,10 @@ const { nanoid } = require('nanoid');
 const multer = require('multer');
 const { GalleryItem } = require('../db');
 const { uploadBufferToCloudinary } = require('../cloudinary');
+const { requireAdminKey } = require('../middleware');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
-
-function requireAdminKey(req, res, next) {
-  const key = req.headers['x-admin-key'];
-  if (!key || key !== process.env.ADMIN_UPLOAD_KEY) {
-    return res.status(401).json({ error: 'Not authorized. Owner access only.' });
-  }
-  next();
-}
 
 router.get('/', async (req, res) => {
   const items = await GalleryItem.find().sort({ createdAt: -1 });
@@ -45,6 +38,12 @@ router.post('/', requireAdminKey, upload.single('photo'), async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
+});
+
+router.delete('/:id', requireAdminKey, async (req, res) => {
+  const deleted = await GalleryItem.findOneAndDelete({ id: req.params.id });
+  if (!deleted) return res.status(404).json({ error: 'Item not found.' });
+  res.json({ success: true });
 });
 
 module.exports = router;
