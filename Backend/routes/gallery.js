@@ -9,7 +9,7 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
 
 // 👉 MUST add this to your app entry point:
-// app.use(express.json());
+ app.use(express.json());
 
 router.get('/', async (req, res) => {
   try {
