@@ -149,85 +149,173 @@
 <script>
   const API_BASE = 'https://shoemaker.onrender.com/api';
 
-  function getAdminKey(){ return sessionStorage.getItem('s4kt_admin_key') || ''; }
+  function getAdminKey() {
+    return sessionStorage.getItem('s4kt_admin_key') || '';
+  }
+
+  async function readResponse(res) {
+    const text = await res.text();
+
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch {
+      return { error: text || `Server returned status ${res.status}` };
+    }
+  }
 
   const lock = document.getElementById('lock');
   const formBox = document.getElementById('uploadForm');
   const keyInput = document.getElementById('keyInput');
   const unlockBtn = document.getElementById('unlockBtn');
 
-  function showForm(){
+  function showForm() {
     lock.style.display = 'none';
     formBox.style.display = 'block';
   }
 
-  async function tryUnlock(){
+  function showLock() {
+    lock.style.display = 'block';
+    formBox.style.display = 'none';
+  }
+
+  async function tryUnlock() {
     const key = keyInput.value.trim() || getAdminKey();
-    if(!key){ alert('Please enter the admin password.'); return; }
-    try{
-      const res = await fetch(`${API_BASE}/gallery`, { method:'GET' });
-      // GET /gallery is public, so instead verify against the orders list (owner-only)
-      const check = await fetch(`${API_BASE}/orders`, { headers:{ 'x-admin-key': key } });
-      if(check.status === 401){ alert('Incorrect password. Please try again.'); return; }
+
+    if (!key) {
+      alert('Please enter the admin password.');
+      return;
+    }
+
+    unlockBtn.disabled = true;
+    unlockBtn.textContent = 'Checking...';
+
+    try {
+      // Assumes /orders is a protected admin endpoint
+      const check = await fetch(`${API_BASE}/orders`, {
+        method: 'GET',
+        headers: {
+          'x-admin-key': key
+        }
+      });
+
+      const data = await readResponse(check);
+
+      if (!check.ok) {
+        sessionStorage.removeItem('s4kt_admin_key');
+
+        if (check.status === 401 || check.status === 403) {
+          alert('Incorrect password. Please try again.');
+        } else {
+          alert(data.error || `Unable to verify access. Server status: ${check.status}`);
+        }
+
+        return;
+      }
+
       sessionStorage.setItem('s4kt_admin_key', key);
       showForm();
-    }catch(err){
-      alert("We couldn't reach the server right now. Please try again shortly.");
+
+    } catch (err) {
+      console.error('Unlock error:', err);
+      alert('Could not reach the server. Check your internet connection and try again.');
+    } finally {
+      unlockBtn.disabled = false;
+      unlockBtn.textContent = 'Unlock';
     }
   }
 
   unlockBtn.addEventListener('click', tryUnlock);
-  keyInput.addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
 
-  // Auto-unlock if already logged in via the dashboard this session
-  if(getAdminKey()) showForm();
+  keyInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      tryUnlock();
+    }
+  });
+
+  // Do not automatically trust a saved key without server verification.
+  // The user can enter it again when needed.
+  // if (getAdminKey()) showForm();
 
   const dropzone = document.getElementById('dropzone');
   const photoInput = document.getElementById('photoInput');
   const dropzoneLabel = document.getElementById('dropzoneLabel');
+
   dropzone.addEventListener('click', () => photoInput.click());
+
   photoInput.addEventListener('change', () => {
-    if(photoInput.files[0]) dropzoneLabel.textContent = `Selected: ${photoInput.files[0].name}`;
+    const file = photoInput.files[0];
+
+    if (file) {
+      dropzoneLabel.textContent = `Selected: ${file.name}`;
+    } else {
+      dropzoneLabel.textContent = 'Click to upload a photo';
+    }
   });
 
   document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    if(!photoInput.files[0]){ alert('Please choose a photo to upload.'); return; }
+
+    const file = photoInput.files[0];
+
+    if (!file) {
+      alert('Please choose a photo to upload.');
+      return;
+    }
 
     const btn = document.getElementById('submitBtn');
-    const original = btn.textContent;
+    const originalText = btn.textContent;
+
     btn.textContent = 'Uploading...';
-    btn.style.pointerEvents = 'none';
+    btn.disabled = true;
 
     const formData = new FormData();
-    formData.append('photo', photoInput.files[0]);
-    formData.append('title', document.getElementById('workTitle').value);
-    formData.append('category', document.getElementById('workCategory').value);
-    formData.append('price', document.getElementById('workPrice').value);
-    formData.append('location', document.getElementById('workLocation').value);
-    formData.append('description', document.getElementById('workDescription').value);
 
-    try{
+    // IMPORTANT: This name must match your backend multer/upload field name.
+    formData.append('photo', file);
+
+    formData.append('title', document.getElementById('workTitle').value.trim());
+    formData.append('category', document.getElementById('workCategory').value);
+    formData.append('price', document.getElementById('workPrice').value.trim());
+    formData.append('location', document.getElementById('workLocation').value.trim());
+    formData.append('description', document.getElementById('workDescription').value.trim());
+
+    try {
       const res = await fetch(`${API_BASE}/gallery`, {
-        method:'POST',
-        headers:{ 'x-admin-key': getAdminKey() },
-        body: formData,
+        method: 'POST',
+        headers: {
+          'x-admin-key': getAdminKey()
+          // Do NOT manually add Content-Type here.
+          // The browser sets multipart/form-data and its boundary automatically.
+        },
+        body: formData
       });
-      const data = await res.json();
-      if(res.ok){
+
+      const data = await readResponse(res);
+
+      if (res.ok) {
         alert('Added to the Gallery successfully!');
         document.getElementById('uploadForm').reset();
         dropzoneLabel.textContent = 'Click to upload a photo';
-      } else if(res.status === 401){
-        alert('Incorrect admin password. Please try again.');
-      } else {
-        alert(data.error || 'Something went wrong. Please try again.');
+        return;
       }
-    }catch(err){
-      alert("We couldn't reach the server right now. Please try again shortly.");
-    }finally{
-      btn.textContent = original;
-      btn.style.pointerEvents = 'auto';
+
+      if (res.status === 401 || res.status === 403) {
+        sessionStorage.removeItem('s4kt_admin_key');
+        showLock();
+        alert('Your admin session has expired or the password is incorrect.');
+        return;
+      }
+
+      console.error('Upload failed:', res.status, data);
+      alert(data.error || `Upload failed. Server status: ${res.status}`);
+
+    } catch (err) {
+      console.error('Upload network error:', err);
+      alert('Could not reach the server. Please try again shortly.');
+    } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
     }
   });
 </script>
